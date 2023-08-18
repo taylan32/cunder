@@ -1,0 +1,21 @@
+application:
+  description: Dating app for Cukurova University
+  version: 1.0.0
+  title: Dating app
+  access_token_key: supersecretaccesstokenkey
+  refresh_token_key: supersecretrefreshtokenkey
+  issuer: Taylan
+  access_token_expiration: 10
+
+spring:
+   jpa:
+     properties:
+       hibernate:
+         dialect: org.hibernate.dialect.PostgreSQLDialect
+         ddl-auto: update
+         show-sql: true
+         format_sql: true
+   datasource:
+     url: jdbc:postgresql://localhost:5432/cunder_db
+     username: postgres
+     password: 1283
