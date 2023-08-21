@@ -7,15 +7,21 @@ application:
   issuer: Taylan
   access_token_expiration: 10
 
+
+
 spring:
-   jpa:
-     properties:
-       hibernate:
-         dialect: org.hibernate.dialect.PostgreSQLDialect
-         ddl-auto: update
-         show-sql: true
-         format_sql: true
-   datasource:
-     url: jdbc:postgresql://localhost:5432/cunder_db
-     username: postgres
-     password: 1283
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    javax:
+      persistence:
+        validation:
+          mode: none
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cunder_db
+    username: postgres
+    password: 1283
