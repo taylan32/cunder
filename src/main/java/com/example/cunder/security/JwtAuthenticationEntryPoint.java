@@ -23,7 +23,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         error.put("status", HttpStatus.UNAUTHORIZED.toString());
         error.put("title", "Authorization error");
         error.put("timestamp", new Date().toString());
-        error.put("message", "Bad credentials");
+        error.put("message", authException.getMessage());
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getOutputStream().println(objectMapper.writeValueAsString(error));

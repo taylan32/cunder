@@ -5,7 +5,7 @@ application:
   access_token_key: supersecretaccesstokenkey
   refresh_token_key: supersecretrefreshtokenkey
   issuer: Taylan
-  access_token_expiration: 10
+  access_token_expiration: 10000
 
 
 

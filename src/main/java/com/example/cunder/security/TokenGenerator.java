@@ -30,12 +30,13 @@ public class TokenGenerator {
         String username = ((UserDetails)authentication.getPrincipal()).getUsername();
         List<String> roles = new ArrayList<>();
         authentication.getAuthorities().forEach(role -> {
-            roles.add(role.getAuthority());
+            roles.add("ROLE_"+role.getAuthority());
         });
 
         return JWT.create()
                 .withSubject(username)
-                .withClaim("role",authentication.getAuthorities().stream().map(role -> role.getAuthority()).collect(Collectors.toList()))
+                .withClaim("roles",authentication.getAuthorities().stream().map(role -> "ROLE_" + role.getAuthority()).collect(Collectors.toList()))
+                .withIssuedAt(new Date(System.currentTimeMillis()))
                 .withExpiresAt(new Date(System.currentTimeMillis() + (EXPIRES_ACCESS_TOKEN_MINUTE * 600 * 1000)))
                 .sign(Algorithm.HMAC256(KEY.getBytes()));
     }

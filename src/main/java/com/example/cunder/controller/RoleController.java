@@ -5,12 +5,15 @@ import com.example.cunder.model.Role;
 import com.example.cunder.service.RoleService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/v1/api/role")
+@PreAuthorize("hasAnyAuthority('ADMIN')")
 public class RoleController {
 
     private final RoleService roleService;
@@ -19,11 +22,13 @@ public class RoleController {
         this.roleService = roleService;
     }
 
+
     @PostMapping
     public ResponseEntity<Void> createRole(@RequestBody @Valid CreateRoleRequest request) {
         roleService.createRole(request);
         return ResponseEntity.noContent().build();
     }
+
 
     @GetMapping
     public ResponseEntity<List<Role>> getAllRoles() {
