@@ -7,8 +7,13 @@ import com.example.cunder.model.Role;
 import com.example.cunder.model.User;
 import com.example.cunder.model.enums.MembershipType;
 import com.example.cunder.repository.UserRepository;
+import com.example.cunder.utils.BasePageableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,13 +42,15 @@ public class UserService {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("User not found"));
     }
+
     protected User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    protected boolean existsByEmail(String email ){
+    protected boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
     }
+
     protected boolean existsByUsername(String username) {
         return userRepository.existsByUsername(username);
     }
@@ -55,7 +62,7 @@ public class UserService {
     public void assignRole(String userId, String roleName) {
         Role role = roleService.findRoleByName(roleName.toUpperCase(Locale.ENGLISH));
         User user = findUserById(userId);
-        if(userRepository.roleAssignedBefore(userId, role.getId())) {
+        if (userRepository.roleAssignedBefore(userId, role.getId())) {
             throw new AlreadyExistsException("Role has already been assigned to this user");
         }
 
@@ -94,7 +101,7 @@ public class UserService {
 
     public void changeMembershipType(String userId, MembershipType membershipType) {
         User user = findUserById(userId);
-        if(user.getMembershipType().equals(membershipType)) {
+        if (user.getMembershipType().equals(membershipType)) {
             throw new AlreadyExistsException("User have already this membership type");
         }
         User updatedUser = new User(
@@ -118,6 +125,18 @@ public class UserService {
         updatedUser.setCreatedAt(user.getCreatedAt());
         userRepository.save(updatedUser);
         logger.info("Membership type changed to " + membershipType.toString());
+    }
+
+    public BasePageableModel<UserDto> getAllUsers(int pageNumber, int pageSize, String field, String direction) {
+        Sort sort = Sort.by(Sort.Direction.fromString(direction), field);
+        Pageable pageable = PageRequest.of(pageNumber - 1, pageSize, sort);
+        Page<User> userPage = userRepository.findAll(pageable);
+        return new BasePageableModel<>(userPage,
+                userPage
+                        .getContent()
+                        .stream()
+                        .map(UserDto::convert)
+                        .collect(Collectors.toList()));
     }
 
 }

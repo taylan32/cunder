@@ -5,6 +5,7 @@ import com.example.cunder.dto.user.ChangeMembershipTypeRequest;
 import com.example.cunder.dto.user.UserDto;
 import com.example.cunder.model.enums.MembershipType;
 import com.example.cunder.service.UserService;
+import com.example.cunder.utils.BasePageableModel;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,6 +39,15 @@ public class UserController {
     public ResponseEntity<Void> checkMembershipType(@PathVariable("id") String userId, @RequestBody @Valid ChangeMembershipTypeRequest request) {
         userService.changeMembershipType(userId, request.membershipType());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<BasePageableModel<UserDto>> getAllUsers(@RequestParam(defaultValue = "1",required = false) int pageNumber,
+                                                                  @RequestParam(defaultValue = "10", required = false) int pageSize,
+                                                                  @RequestParam(defaultValue = "id",required = false) String field,
+                                                                  @RequestParam(defaultValue = "asc", required = false) String direction) {
+
+        return ResponseEntity.ok(userService.getAllUsers(pageNumber, pageSize, field, direction));
     }
 
 }

@@ -1,6 +1,10 @@
 package com.example.cunder.repository;
 
 import com.example.cunder.model.User;
+import jakarta.annotation.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -24,4 +28,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     @Query(value = "SELECT * FROM users u WHERE EXISTS (SELECT user_id FROM user_roles WHERE role_id=:roleId)", nativeQuery = true)
     List<User> getAllUsersByRole(String roleId);
+
+    Page<User> findAll(@Nullable Pageable pageable);
+
 }

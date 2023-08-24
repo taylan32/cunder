@@ -3,7 +3,9 @@ package com.example.cunder.controller;
 import com.example.cunder.dto.department.CreateDepartmentRequest;
 import com.example.cunder.model.Department;
 import com.example.cunder.service.DepartmentService;
+import com.example.cunder.utils.BasePageableModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,14 +21,19 @@ public class DepartmentController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<Void> createDepartment(@RequestBody CreateDepartmentRequest request) {
         departmentService.createDepartment(request);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<List<Department>> getAllDepartments() {
-        return ResponseEntity.ok(departmentService.getDepartments());
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<BasePageableModel<Department>> getAllDepartments(@RequestParam(defaultValue = "1",required = false) int pageNumber,
+                                                                           @RequestParam(defaultValue = "10", required = false) int pageSize,
+                                                                           @RequestParam(defaultValue = "code",required = false) String field,
+                                                                           @RequestParam(defaultValue = "asc", required = false) String direction) {
+        return ResponseEntity.ok(departmentService.getDepartments(pageNumber, pageSize, field, direction));
     }
 
     @GetMapping("/{code}")
