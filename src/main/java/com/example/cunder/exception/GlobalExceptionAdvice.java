@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -71,6 +72,16 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
         error.put("message", exception.getMessage());
         error.put("status", HttpStatus.FORBIDDEN.toString());
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+    }
+
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<Object> handleSQLException(SQLException exception) {
+        Map<String, String> error = new HashMap<>();
+        error.put("timestamp", LocalDateTime.now().toString());
+        error.put("title", "SQL Exception");
+        error.put("message", exception.getMessage());
+        error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.toString());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
 }

@@ -11,6 +11,7 @@ import org.hibernate.annotations.GenericGenerator;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -111,5 +112,16 @@ public class User extends BaseEntity {
         this.roles = roles;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id.equals(user.id) && email.equals(user.email) && username.equals(user.username);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, email, username);
+    }
 }

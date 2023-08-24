@@ -5,10 +5,12 @@ import com.example.cunder.exception.AlreadyExistsException;
 import com.example.cunder.exception.NotFoundException;
 import com.example.cunder.model.Role;
 import com.example.cunder.model.User;
+import com.example.cunder.model.enums.MembershipType;
 import com.example.cunder.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserService {
+
+    private final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     private final UserRepository userRepository;
     private final RoleService roleService;
@@ -86,6 +90,34 @@ public class UserService {
                 .stream()
                 .map(UserDto::convert)
                 .collect(Collectors.toList());
+    }
+
+    public void changeMembershipType(String userId, MembershipType membershipType) {
+        User user = findUserById(userId);
+        if(user.getMembershipType().equals(membershipType)) {
+            throw new AlreadyExistsException("User have already this membership type");
+        }
+        User updatedUser = new User(
+                user.getId(),
+                user.getEmail(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getDepartment(),
+                user.getUsername(),
+                user.getPassword(),
+                user.getBirthOfDate(),
+                user.getGender(),
+                user.getProfileImage(),
+                user.getProfileImage(),
+                user.isDeleted(),
+                user.isVerified(),
+                user.isBanned(),
+                membershipType,
+                user.getRoles()
+        );
+        updatedUser.setCreatedAt(user.getCreatedAt());
+        userRepository.save(updatedUser);
+        logger.info("Membership type changed to " + membershipType.toString());
     }
 
 }
