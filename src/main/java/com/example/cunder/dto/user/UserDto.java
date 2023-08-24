@@ -28,7 +28,7 @@ public record UserDto(
                 from.getFirstName(),
                 from.getLastName(),
                 DepartmentDto.convert(from.getDepartment()),
-                from.getBirthOfDate(),
+                from.getBirthDate(),
                 from.getProfileImage(),
                 from.getCoverImage(),
                 from.getMembershipType()

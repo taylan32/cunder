@@ -24,8 +24,8 @@ public record CreateUserRequest(
         @NotBlank(message = "Password is not allowed to be empty")
         @Size(min = 6, max = 16, message = "Password can be between 6 and 16 characters")
         String password,
-        @NotNull(message = "Birth of date cannot be null")
-        LocalDate birthOfDate,
+        @NotNull(message = "Birth date cannot be null")
+        LocalDate birthDate,
         @NotNull(message = "Gender cannot be null")
         Gender gender
 

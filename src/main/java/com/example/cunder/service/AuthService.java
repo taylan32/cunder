@@ -15,6 +15,7 @@ import com.example.cunder.security.TokenGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -59,10 +60,11 @@ public class AuthService {
                 departmentService.findDepartmentByCode("555"),
                 request.username(),
                 passwordEncoder.encode(request.password()),
-                request.birthOfDate(),
+                request.birthDate(),
                 request.gender(),
                 "default.png",
                 "default.png",
+                "",
                 false,
                 true, // TODO: email ile doğrulama yaptıktan sonra false olarak değiştir
                 false,
@@ -102,6 +104,9 @@ public class AuthService {
 
     private void checkForLoginRules(LoginRequest request) {
         User user = userService.findByUsername(request.username());
+        if(user == null) {
+            throw new BadCredentialsException("Bad credentials");
+        }
         if(user.isBanned()) {
             logger.error("Banned user try to login: " + user.getUsername());
             throw new BannedUserLoginException("Your account has been banned");

@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -46,8 +44,8 @@ public class User extends BaseEntity {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "birth_of_date")
-    private LocalDate birthOfDate;
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "gender")
@@ -58,6 +56,8 @@ public class User extends BaseEntity {
 
     @Column(name = "cover_image")
     private String coverImage;
+
+    private String bio;
 
     @Column(name = "is_deleted")
     private boolean isDeleted;
@@ -86,10 +86,11 @@ public class User extends BaseEntity {
                 Department department,
                 String username,
                 String password,
-                LocalDate birthOfDate,
+                LocalDate birthDate,
                 Gender gender,
                 String profileImage,
                 String coverImage,
+                String bio,
                 boolean isDeleted,
                 boolean isVerified,
                 boolean isBanned,
@@ -101,10 +102,11 @@ public class User extends BaseEntity {
         this.department = department;
         this.username = username;
         this.password = password;
-        this.birthOfDate = birthOfDate;
+        this.birthDate = birthDate;
         this.gender = gender;
         this.profileImage = profileImage;
         this.coverImage = coverImage;
+        this.bio = bio;
         this.isDeleted = isDeleted;
         this.isVerified = isVerified;
         this.isBanned = isBanned;

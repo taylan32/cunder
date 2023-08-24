@@ -2,6 +2,7 @@ package com.example.cunder.controller;
 
 import com.example.cunder.dto.user.AssignRoleRequest;
 import com.example.cunder.dto.user.ChangeMembershipTypeRequest;
+import com.example.cunder.dto.user.UpdateUserRequest;
 import com.example.cunder.dto.user.UserDto;
 import com.example.cunder.model.enums.MembershipType;
 import com.example.cunder.service.UserService;
@@ -15,7 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/api/user")
-@PreAuthorize("hasAnyAuthority('ADMIN')")
 public class UserController {
 
     private final UserService userService;
@@ -25,29 +25,40 @@ public class UserController {
     }
 
     @PutMapping("/assign")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<Void> assignRole(@RequestBody @Valid AssignRoleRequest request) {
         userService.assignRole(request.userId(), request.roleName());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/getByRole")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<List<UserDto>> getAllUsersByRole(@RequestParam String role) {
         return ResponseEntity.ok(userService.getAllUserByRole(role));
     }
 
     @PatchMapping("/membership-type/{id}")
-    public ResponseEntity<Void> checkMembershipType(@PathVariable("id") String userId, @RequestBody @Valid ChangeMembershipTypeRequest request) {
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<Void> changeMembershipType(@PathVariable("id") String userId, @RequestBody @Valid ChangeMembershipTypeRequest request) {
         userService.changeMembershipType(userId, request.membershipType());
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<BasePageableModel<UserDto>> getAllUsers(@RequestParam(defaultValue = "1",required = false) int pageNumber,
                                                                   @RequestParam(defaultValue = "10", required = false) int pageSize,
                                                                   @RequestParam(defaultValue = "id",required = false) String field,
                                                                   @RequestParam(defaultValue = "asc", required = false) String direction) {
 
         return ResponseEntity.ok(userService.getAllUsers(pageNumber, pageSize, field, direction));
+    }
+
+    @PutMapping("/update/{username}")
+    @PreAuthorize("hasAnyAuthority('ADMIN') or #username==authentication.principal.username")
+    public ResponseEntity<Void> updateUser(@PathVariable("username") String username, @RequestBody @Valid UpdateUserRequest request) {
+        userService.updateUser(username, request);
+        return ResponseEntity.noContent().build();
     }
 
 }
