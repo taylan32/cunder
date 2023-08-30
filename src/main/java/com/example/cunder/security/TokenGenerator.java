@@ -47,6 +47,7 @@ public class TokenGenerator {
             DecodedJWT decodedToken = verifier.verify(token);
             return decodedToken;
         } catch (RuntimeException e) {
+            // TODO change RuntimeException with AuthenticationException later
             throw new RuntimeException(e.getMessage());
         }
     }

@@ -1,15 +1,14 @@
 package com.example.cunder.controller;
 
-import com.example.cunder.dto.user.AssignRoleRequest;
-import com.example.cunder.dto.user.ChangeMembershipTypeRequest;
-import com.example.cunder.dto.user.UpdateUserRequest;
-import com.example.cunder.dto.user.UserDto;
+import com.example.cunder.controller.constraint.ChangePasswordRequestConstraint;
+import com.example.cunder.dto.user.*;
 import com.example.cunder.model.enums.MembershipType;
 import com.example.cunder.service.UserService;
 import com.example.cunder.utils.BasePageableModel;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,6 +58,16 @@ public class UserController {
     public ResponseEntity<Void> updateUser(@PathVariable("username") String username, @RequestBody @Valid UpdateUserRequest request) {
         userService.updateUser(username, request);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/change-password/{username}")
+    @PreAuthorize("hasAnyAuthority('ADMIN') or #username==authentication.principal.username")
+    public ResponseEntity<Void> changePassword(@PathVariable("username") String username,
+                                               @RequestBody @Valid @ChangePasswordRequestConstraint ChangePasswordRequest request){
+
+        userService.changePassword(username, request);
+        return ResponseEntity.noContent().build();
+
     }
 
 }

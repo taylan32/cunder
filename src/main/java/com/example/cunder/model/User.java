@@ -4,7 +4,7 @@ import com.example.cunder.model.enums.Gender;
 import com.example.cunder.model.enums.MembershipType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
+@Data
 @Table(name = "users")
 public class User extends BaseEntity {
 

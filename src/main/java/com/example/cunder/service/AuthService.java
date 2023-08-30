@@ -3,6 +3,7 @@ package com.example.cunder.service;
 import com.example.cunder.dto.auth.CreateUserRequest;
 import com.example.cunder.dto.auth.LoginRequest;
 import com.example.cunder.dto.auth.LoginResponse;
+import com.example.cunder.dto.user.ChangePasswordRequest;
 import com.example.cunder.dto.user.UserDto;
 import com.example.cunder.exception.AlreadyExistsException;
 import com.example.cunder.exception.BannedUserLoginException;
@@ -120,6 +121,7 @@ public class AuthService {
             throw new NotFoundException("User not found");
         }
     }
+
 
 
 }

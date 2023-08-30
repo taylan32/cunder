@@ -1,5 +1,6 @@
 package com.example.cunder.service;
 
+import com.example.cunder.dto.user.ChangePasswordRequest;
 import com.example.cunder.dto.user.UpdateUserRequest;
 import com.example.cunder.dto.user.UserDto;
 import com.example.cunder.exception.AlreadyExistsException;
@@ -32,13 +33,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final RoleService roleService;
-    private final DepartmentService  departmentService;
+    private final DepartmentService departmentService;
+    private final PasswordEncoder passwordEncoder;
+
     public UserService(UserRepository userRepository,
                        RoleService roleService,
-                       DepartmentService departmentService) {
+                       DepartmentService departmentService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleService = roleService;
         this.departmentService = departmentService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     protected User createUser(User user) {
@@ -62,40 +66,16 @@ public class UserService {
         return userRepository.existsByUsername(username);
     }
 
-    protected boolean existsById(String id) {
-        return userRepository.existsById(id);
-    }
-
     public void assignRole(String userId, String roleName) {
         Role role = roleService.findRoleByName(roleName.toUpperCase(Locale.ENGLISH));
         User user = findUserById(userId);
-        if (userRepository.roleAssignedBefore(userId, role.getId())) {
+        /*if (userRepository.roleAssignedBefore(userId, role.getId())) {
             throw new AlreadyExistsException("Role has already been assigned to this user");
-        }
-
+        }*/
         Set<Role> roles = user.getRoles();
         roles.add(role);
-        User newUser = new User(
-                user.getId(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getDepartment(),
-                user.getUsername(),
-                user.getPassword(),
-                user.getBirthDate(),
-                user.getGender(),
-                user.getProfileImage(),
-                user.getCoverImage(),
-                user.getBio(),
-                user.isDeleted(),
-                user.isVerified(),
-                user.isBanned(),
-                user.getMembershipType(),
-                roles
-        );
-        user.setCreatedAt(user.getCreatedAt());
-        userRepository.save(newUser);
+        user.setRoles(roles);
+        userRepository.save(user);
 
     }
 
@@ -112,27 +92,8 @@ public class UserService {
         if (user.getMembershipType().equals(membershipType)) {
             throw new AlreadyExistsException("User have already this membership type");
         }
-        User updatedUser = new User(
-                user.getId(),
-                user.getEmail(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getDepartment(),
-                user.getUsername(),
-                user.getPassword(),
-                user.getBirthDate(),
-                user.getGender(),
-                user.getProfileImage(),
-                user.getCoverImage(),
-                user.getBio(),
-                user.isDeleted(),
-                user.isVerified(),
-                user.isBanned(),
-                membershipType,
-                user.getRoles()
-        );
-        updatedUser.setCreatedAt(user.getCreatedAt());
-        userRepository.save(updatedUser);
+        user.setMembershipType(membershipType);
+        userRepository.save(user);
         logger.info("Membership type changed to " + membershipType.toString());
     }
 
@@ -149,60 +110,38 @@ public class UserService {
     }
 
     public void updateUser(String username, UpdateUserRequest request) {
-        User user = findByUsername(username);
-        if(user == null) {
-            throw new NotFoundException("User not found");
+        User user = userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        setFields(user, request);
+        userRepository.save(user);
+    }
+
+    private User setFields(User user, UpdateUserRequest request) {
+
+        if (checkIfAuthenticatedUserHasRole("ADMIN")) {
+            user.setFirstName(request.firstName() == null ? user.getFirstName() : request.firstName());
+            user.setLastName(request.lastName() == null ? user.getLastName() : request.lastName());
+            user.setDepartment(request.departmentId() == null ? user.getDepartment() : departmentService.findDepartmentById(request.departmentId()));
+            user.setBirthDate(request.birthDate() == null ? user.getBirthDate() : request.birthDate());
+            user.setGender(request.gender() == null ? user.getGender() : request.gender());
+            user.setBio(request.bio() == null ? user.getBio() : request.bio());
+        } else {
+            user.setBio(request.bio() == null ? user.getBio() : request.bio());
         }
-        User updatedUser = null;
-        if(checkIfAuthenticatedUserHasRole("ADMIN")) {
-             updatedUser = new User(
-                     user.getId(),
-                     user.getEmail(),
-                     request.firstName() == null ? user.getFirstName() : request.firstName(),
-                     request.lastName() == null ? user.getLastName() : request.lastName(),
-                     request.departmentId() == null ? user.getDepartment() : departmentService.findDepartmentById(request.departmentId()),
-                     user.getUsername(),
-                     user.getPassword(),
-                     request.birthDate() == null ? user.getBirthDate() : request.birthDate(),
-                     request.gender() == null ? user.getGender() : request.gender(),
-                     user.getProfileImage(),
-                     user.getCoverImage(),
-                     request.bio() == null ? user.getBio() : request.bio(),
-                     user.isDeleted(),
-                     user.isVerified(),
-                     user.isBanned(),
-                     user.getMembershipType(),
-                     user.getRoles()
-             );
-        }
-        else {
-             updatedUser = new User(
-                    user.getId(),
-                    user.getEmail(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.getDepartment(),
-                    user.getUsername(),
-                    user.getPassword(),
-                    user.getBirthDate(),
-                    user.getGender(),
-                    user.getProfileImage(),
-                    user.getCoverImage(),
-                    request.bio() == null ? user.getBio() : request.bio(),
-                    user.isDeleted(),
-                    user.isVerified(),
-                    user.isBanned(),
-                    user.getMembershipType(),
-                    user.getRoles()
-            );
-        }
-        updatedUser.setCreatedAt(user.getCreatedAt());
-        userRepository.save(updatedUser);
+
+        return user;
+    }
+
+    public void changePassword(String username, ChangePasswordRequest request) {
+        User user = userRepository.findUserByUsername(username)
+                .orElseThrow(() -> new NotFoundException("User not found"));
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
     }
 
     private boolean checkIfAuthenticatedUserHasRole(String roleName) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication != null && authentication.getAuthorities().stream().map(role-> role.getAuthority()).collect(Collectors.toList()).contains(roleName) == true)   {
+        if (authentication != null && authentication.getAuthorities().stream().map(role -> role.getAuthority()).collect(Collectors.toList()).contains(roleName) == true) {
             return true;
         }
         return false;
