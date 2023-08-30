@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({METHOD, FIELD, PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ChangePasswordRequestConstraint {
-    String message() default "Invalid email value";
+    String message() default "password and password repeat must be same";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
