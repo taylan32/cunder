@@ -4,6 +4,7 @@ import com.example.cunder.dto.user.ChangePasswordRequest;
 import com.example.cunder.dto.user.UpdateUserRequest;
 import com.example.cunder.dto.user.UserDto;
 import com.example.cunder.exception.AlreadyExistsException;
+import com.example.cunder.exception.InvalidPasswordChangeRequestException;
 import com.example.cunder.exception.NotFoundException;
 import com.example.cunder.model.Role;
 import com.example.cunder.model.User;
@@ -135,7 +136,10 @@ public class UserService {
     public void changePassword(String username, ChangePasswordRequest request) {
         User user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if(!user.getPassword().equals(passwordEncoder.encode(request.password()))) {
+            throw new InvalidPasswordChangeRequestException("Old password is not matched");
+        }
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
         userRepository.save(user);
     }
 

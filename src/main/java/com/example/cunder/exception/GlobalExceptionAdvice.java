@@ -84,4 +84,15 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
 
+    @ExceptionHandler(InvalidPasswordChangeRequestException.class)
+    public ResponseEntity<Object> handleInvalidPasswordChangeRequestException(InvalidPasswordChangeRequestException exception) {
+        Map<String, String> error = new HashMap<>();
+        error.put("timestamp", LocalDateTime.now().toString());
+        error.put("title", "Invalid password change request");
+        error.put("message", exception.getMessage());
+        error.put("status", HttpStatus.BAD_REQUEST.toString());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+
 }
