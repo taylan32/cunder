@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target({METHOD, FIELD, PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ChangePasswordRequestConstraint {
-    String message() default "password and password repeat must be same";
+    String message() default "New password is not confirmed";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

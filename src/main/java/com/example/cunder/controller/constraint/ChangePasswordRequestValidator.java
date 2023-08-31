@@ -15,6 +15,6 @@ public class ChangePasswordRequestValidator implements ConstraintValidator<Chang
     }
     @Override
     public boolean isValid(ChangePasswordRequest value, ConstraintValidatorContext context) {
-        return value.password().equals(value.passwordRepeat());
+        return value.newPassword().equals(value.newPasswordConfirm());
     }
 }
