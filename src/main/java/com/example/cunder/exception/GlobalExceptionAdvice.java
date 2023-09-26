@@ -94,5 +94,15 @@ public class GlobalExceptionAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    @ExceptionHandler(MathRequestLimitExceedException.class)
+    public ResponseEntity<Object> handleMatchRequestLimitExceedException(MathRequestLimitExceedException exception) {
+        Map<String, String> error = new HashMap<>();
+        error.put("timestamp", LocalDateTime.now().toString());
+        error.put("title", "Match limit exceeded.");
+        error.put("message", exception.getMessage());
+        error.put("status", HttpStatus.BAD_REQUEST.toString());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
 
 }

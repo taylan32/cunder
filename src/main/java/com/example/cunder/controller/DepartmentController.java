@@ -28,7 +28,7 @@ public class DepartmentController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    //@PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<BasePageableModel<Department>> getAllDepartments(@RequestParam(defaultValue = "1",required = false) int pageNumber,
                                                                            @RequestParam(defaultValue = "10", required = false) int pageSize,
                                                                            @RequestParam(defaultValue = "code",required = false) String field,

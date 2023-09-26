@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
@@ -80,6 +81,11 @@ public class User extends BaseEntity {
     )
     private Set<Role> roles;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Match> matches;
+
+    @OneToOne(mappedBy = "user")
+    private RefreshToken refreshToken;
     public User(String email,
                 String firstName,
                 String lastName,

@@ -8,6 +8,7 @@ import com.example.cunder.exception.InvalidPasswordChangeRequestException;
 import com.example.cunder.exception.NotFoundException;
 import com.example.cunder.model.Role;
 import com.example.cunder.model.User;
+import com.example.cunder.model.enums.Gender;
 import com.example.cunder.model.enums.MembershipType;
 import com.example.cunder.repository.UserRepository;
 import com.example.cunder.utils.BasePageableModel;
@@ -22,9 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -136,7 +135,7 @@ public class UserService {
     public void changePassword(String username, ChangePasswordRequest request) {
         User user = userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new NotFoundException("User not found"));
-        if(!user.getPassword().equals(passwordEncoder.encode(request.password()))) {
+        if (!user.getPassword().equals(passwordEncoder.encode(request.password()))) {
             throw new InvalidPasswordChangeRequestException("Old password is not matched");
         }
         user.setPassword(passwordEncoder.encode(request.newPassword()));
@@ -150,5 +149,12 @@ public class UserService {
         }
         return false;
     }
+
+    protected Set<User> getSuggestion(String gender, int suggestionCount) {
+        return userRepository.findRandomUsersWithOppositeGender(gender, suggestionCount);
+    }
+
+
+
 
 }

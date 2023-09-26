@@ -3,12 +3,12 @@ package com.example.cunder.service;
 import com.example.cunder.dto.auth.CreateUserRequest;
 import com.example.cunder.dto.auth.LoginRequest;
 import com.example.cunder.dto.auth.LoginResponse;
-import com.example.cunder.dto.user.ChangePasswordRequest;
 import com.example.cunder.dto.user.UserDto;
 import com.example.cunder.exception.AlreadyExistsException;
 import com.example.cunder.exception.BannedUserLoginException;
 import com.example.cunder.exception.NotFoundException;
 import com.example.cunder.exception.UnverifiedUserLoginException;
+import com.example.cunder.model.RefreshToken;
 import com.example.cunder.model.Role;
 import com.example.cunder.model.User;
 import com.example.cunder.model.enums.MembershipType;
@@ -36,18 +36,21 @@ public class AuthService {
     private final TokenGenerator tokenGenerator;
     private final AuthenticationManager authenticationManager;
     private final RoleService roleService;
+    private final RefreshTokenService refreshTokenService;
     public AuthService(UserService userService,
                        PasswordEncoder passwordEncoder,
                        DepartmentService departmentService,
                        TokenGenerator tokenGenerator,
                        AuthenticationManager authenticationManager,
-                       RoleService roleService) {
+                       RoleService roleService,
+                       RefreshTokenService refreshTokenService) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
         this.departmentService = departmentService;
         this.tokenGenerator = tokenGenerator;
         this.authenticationManager = authenticationManager;
         this.roleService = roleService;
+        this.refreshTokenService = refreshTokenService;
     }
 
 
@@ -70,10 +73,16 @@ public class AuthService {
                 true, // TODO: email ile doğrulama yaptıktan sonra false olarak değiştir
                 false,
                 MembershipType.STANDARD,
-                new HashSet<>(Set.of(role))
+                new HashSet<>(Set.of(role))//,
+                //new HashSet<>()
         );
         User registeredUser = userService.createUser(user);
+        // create refreshToken for user
+        RefreshToken token = refreshTokenService.createRefreshToken(registeredUser);
+
         // send email to verification
+
+
         logger.info("User created: " + user.getUsername());
     }
 
@@ -83,9 +92,7 @@ public class AuthService {
             Authentication auth = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.username(), request.password())
             );
-            return new LoginResponse(tokenGenerator.generateToken(auth),
-                    UserDto.convert(userService.findByUsername(request.username()))
-            );
+            return new LoginResponse(tokenGenerator.generateToken(auth), refreshTokenService.getRefreshToken(request.username()));
 
         /*} catch (final BadCredentialsException exception) {
             throw new BadCredentialsException(exception.getMessage());

@@ -70,4 +70,10 @@ public class UserController {
 
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<Void> getSuggestions() {
+        //userService.getSuggestion();
+        return ResponseEntity.noContent().build();
+    }
+
 }
